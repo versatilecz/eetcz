@@ -41,7 +41,6 @@ class EETRequestHeader(object):
                                             'uuid_zpravy': self.getUUID(),
                                             'dat_odesl': self.getDate(),
                                             'prvni_zaslani': self.getFirstSend(),
-                                            'overeni': self.getDebug()
                                         },
                                 nsmap=NSMAP
                             )

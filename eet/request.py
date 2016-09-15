@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+import re
 import datetime
-import xmlsec
-import base64
+from base64 import b64encode, b64decode
 import hashlib
 import requests
 
@@ -36,15 +36,15 @@ class EETRequest(object):
 
     def element(self):
         envelope = etree.Element(ns(SOAP_NS, 'Envelope'), nsmap=NSMAP)
-        trzba = etree.Element(ns(EET_NS, 'Trzba'), nsmap=NSMAP)
-        trzba.append(self.header.element())
-        trzba.append(self.data.element())
-        trzba.append(self.code.element())
 
         header = etree.SubElement(envelope, ns(SOAP_NS, 'Header'), nsmap=NSMAP)
         body_id = get_unique_id()
         body = etree.SubElement(envelope, ns(SOAP_NS, 'Body'), attrib={ns(WSU_NS, 'Id'): body_id}, nsmap=NSMAP)
-        body.append(trzba)
+
+        trzba = etree.SubElement(body, ns(EET_NS, 'Trzba'), nsmap=NSMAP)
+        trzba.append(self.header.element())
+        trzba.append(self.data.element())
+        trzba.append(self.code.element())
 
         security = etree.SubElement(header, ns(WSSE_NS, 'Security'), attrib={ns(SOAP_NS, 'mustUnderstand'): '1'}, nsmap=NSMAP)
 
@@ -60,7 +60,7 @@ class EETRequest(object):
         signature = etree.SubElement(security, ns(DS_NS, 'Signature'), attrib={'Id': signature_id})
         signed_info = etree.SubElement(signature, ns(DS_NS, 'SignedInfo'))
         canonicalization_method = etree.SubElement(signed_info, ns(DS_NS, 'CanonicalizationMethod'), attrib={'Algorithm': EXC_NS})
-        cm_in = etree.SubElement(canonicalization_method, ns(EXC_NS,'InclusiveNamespaces'), attrib={'PrefixList': 'soap'})
+        cm_in = etree.SubElement(canonicalization_method, ns(EXC_NS,'InclusiveNamespaces'))
         signature_method = etree.SubElement(signed_info, ns(DS_NS, 'SignatureMethod'), attrib={'Algorithm': RSA_SHA256})
         ds_reference = etree.SubElement(signed_info, ns(DS_NS, 'Reference'), attrib={'URI': '#%s' % body_id})
         ds_transforms = etree.SubElement(ds_reference, ns(DS_NS, 'Transforms'))
@@ -75,29 +75,25 @@ class EETRequest(object):
         security_token_reference = etree.SubElement(key_info, ns(WSSE_NS, 'SecurityTokenReference'), attrib={ns(WSU_NS, 'Id'): security_token_reference_id})
         wsse_reference = etree.SubElement(security_token_reference, ns(WSSE_NS, 'Reference'), attrib={'URI': '#%s' % token_id, 'ValueType': X509TOKEN})
 
+        # generate digest
+        payload = etree.tostring(body, method='c14n', exclusive=True, with_comments=False)
+        sha256 = hashlib.sha256(payload)
+        digest = b64encode(sha256.digest())
+        digest_value.text = digest
+
+        # sign structure
+        payload = etree.tostring(signed_info, method='c14n', exclusive=True, with_comments=False)
         private_key = serialization.load_pem_private_key(self.config.key, password=self.config.password, backend=default_backend())
         signer = private_key.signer(padding.PKCS1v15(), hashes.SHA256())
-
-        signer.update(etree.tostring(body, method='c14n', exclusive=True, with_comments=False).replace('\n', ''))
-        sign = signer.finalize().strip('\n')
-
-        signature_value.text = base64.encodestring(sign).strip('\n')
-        sha256 = hashlib.sha256(sign)
-        digest_value.text = base64.encodestring(sha256.digest()).strip('\n')
+        signer.update(payload)
+        signature_value.text = b64encode(signer.finalize())
 
         return envelope
 
     def serialize(self):
         element = self.element()
-        nsmap = [item for item in NSMAP.keys() if item is not None]
-        data = ['<?xml version="1.0" encoding="UTF-8"?>', etree.tostring(element, method='c14n', exclusive=True, with_comments=False).replace('\n', '')]
-        return '\n'.join(data)
+        return etree.tostring(element, encoding="UTF-8", xml_declaration=True)
 
     def request(self):
-        data = self.serialize()
-        f = open('out', 'w')
-        f.write(data)
-        f.close()
-        #r = requests.post(self.config.getURL(), data=data)
-        #return r
-        return data
+        r = requests.post(self.config.getURL(), data=self.serialize())
+        return r

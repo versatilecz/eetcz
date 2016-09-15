@@ -79,8 +79,7 @@ class EETRequestData(object):
         if self.normal_vat_sum:
             attrib[u'dan1'] = self.getNormalVatSum()
 
-        if self.simple:
-            attrib[u'rezim'] = self.getSimple()
+        attrib[u'rezim'] = self.getSimple()
 
         return etree.Element(ns(EET_NS, 'Data'), attrib=attrib, nsmap=NSMAP)
 

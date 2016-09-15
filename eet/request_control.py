@@ -23,10 +23,10 @@ class EETRequestControl(object):
         signer = private_key.signer(padding.PKCS1v15(), hashes.SHA256())
 
         signer.update(self.data.encode('utf8'))
-        return signer.finalize().strip('\n')
+        return signer.finalize()
 
     def encodeSign(self):
-        return base64.encodestring(self.sign).strip('\n')
+        return base64.encodestring(self.sign).replace('\n', '')
 
     def hashSign(self):
         sha1 = hashlib.sha1(self.sign)

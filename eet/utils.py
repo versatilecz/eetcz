@@ -29,7 +29,7 @@ NSMAP = {
         'ds': DS_NS,
         'wsse': WSSE_NS,
         'wsu': WSU_NS,
-        None: EET_NS,
+        'eet': EET_NS,
     }
 
 timezone = timezone = pytz.timezone('Europe/Prague')
