@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from eet.request_header import EETRequestHeader
 from eet.request_data import EETRequestData
 from eet.request_control import EETRequestControl
+from eet.response import EETResponse
 from eet.utils import *
 from eet.config import Config
 
@@ -24,7 +25,7 @@ class EETRequest(object):
     @staticmethod
     def test():
         config = Config()
-        return EETRequest(config, date=datetime.datetime(2016,8,5,0,30,12,0, timezone), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42')
+        return EETRequest(config, date=now(), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42')
 
 
     def __init__(self, config, **kwargs):
@@ -94,6 +95,5 @@ class EETRequest(object):
         element = self.element()
         return etree.tostring(element, encoding="UTF-8", xml_declaration=True)
 
-    def request(self):
-        r = requests.post(self.config.getURL(), data=self.serialize())
-        return r
+    def send(self):
+        return EETResponse(requests.post(self.config.getURL(), data=self.serialize()))
