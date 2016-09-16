@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-        name='czecheet',
+        name='eet-cz',
         version='0.1',
         description='Library to comunicate with czech tax office',
         url='https://git.profires.cz/webapp/authapp',

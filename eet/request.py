@@ -214,7 +214,7 @@ class EETRequest(object):
         '''
         Function,
         '''
-        return EETRequest(Config.test(), date=now(), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42')
+        return EETRequest(EETConfig.test(), date=now(), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42')
 
 
     def __init__(self, config, **kwargs):

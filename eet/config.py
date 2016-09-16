@@ -99,13 +99,13 @@ QYsaCQHTMCABpVF1Ay0IuR5i7E+yPa938ZWoecFrlixYW9R+sH/Sfa8F22x4mj0c
 7yVZM6k7GdvJdS9AVwAcVcGfiqzPnS1LnZYM
 -----END CERTIFICATE-----'''
 
-default_url = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/?wsdl'
+DEFAULT_URL = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/?wsdl'
 
-class Config(object):
+class EETConfig(object):
 
     @staticmethod
     def test():
-        return Config('CZ00000019', 237, '/5546/RO24', debug=False, key=DEFAULT_KEY, cert=DEFAULT_CERT, root_cert=DEFAULT_ROOT_CERT)
+        return EETConfig('CZ00000019', 237, '/5546/RO24', debug=False, key=DEFAULT_KEY, cert=DEFAULT_CERT, root_cert=DEFAULT_ROOT_CERT)
 
 
     def __init__(self, dic, id_shop, id_register, key=None, key_file=None, key_password=None, cert=None, cert_file=None, root_cert=None, root_cert_file=None, url=None, simple=False, debug=False, dic_commission=None):
@@ -119,7 +119,7 @@ class Config(object):
         self.key = self._loadKey(key, key_file)
         self.cert = self._loadCert(cert, cert_file)
         self.root_crt = self._loadRootCert(cert, cert_file)
-        self.url = url or default_url
+        self.url = url or DEFAULT_URL
 
     def _loadKey(self, key, key_file):
         if self.debug:
