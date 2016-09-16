@@ -1,16 +1,28 @@
-from eet.utils import *
+# -*- coding: utf-8 -*-
 
-class Config(object):
+SOAP_NS = 'http://schemas.xmlsoap.org/soap/envelope/'
+EXC_NS = 'http://www.w3.org/2001/10/xml-exc-c14n#'
+DS_NS = 'http://www.w3.org/2000/09/xmldsig#'
+ENC_NS = 'http://www.w3.org/2001/04/xmlenc#'
+WSS_BASE = 'http://docs.oasis-open.org/wss/2004/01/'
+WSSE_NS = WSS_BASE + 'oasis-200401-wss-wssecurity-secext-1.0.xsd'
+WSU_NS = WSS_BASE + 'oasis-200401-wss-wssecurity-utility-1.0.xsd'
+BASE64B = WSS_BASE + 'oasis-200401-wss-soap-message-security-1.0#Base64Binary'
+X509TOKEN = WSS_BASE + 'oasis-200401-wss-x509-token-profile-1.0#X509v3'
+RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+SHA256 = 'http://www.w3.org/2001/04/xmlenc#sha256'
+EET_NS = 'http://fs.mfcr.cz/eet/schema/v3'
 
-    def __init__(self, **kwargs):
-        self.debug = kwargs.get('debug', True)
-        self.dic = kwargs.get('dic', 'CZ00000019')
-        self.dic_commission = kwargs.get('dic_commission', 'CZ00000019')
-        self.id_shop = kwargs.get('id_shop', '273')
-        self.id_register = kwargs.get('id_register', '/5546/RO24')
-        self.simple = kwargs.get('simple', False)
-        self.password = None
-        self.key = '''-----BEGIN PRIVATE KEY-----
+NSMAP = {
+        'soap': SOAP_NS,
+        'ec': EXC_NS,
+        'ds': DS_NS,
+        'wsse': WSSE_NS,
+        'wsu': WSU_NS,
+        'eet': EET_NS,
+}
+
+DEFAULT_KEY = '''-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDFCIfnLl3YjNyx
 M3y2FAVovKQMetfyyj/lfLY3DoN1z/8gaVRfcqTZbwh9Btg0HafSmrWBvfgjEC/p
 G9HNawYZ9nPE+WIP9bXkoOfDTmmVtX4n6OLi2Di+U7+FmPJzykV0ujsOsfcGnQ0f
@@ -38,7 +50,8 @@ CP2VuibPIYwMwJab9bPYphW2js6MGl34S5KQLjLRQldIoW0S7m/dACF2S4ba9DSe
 fvbegDaZIc/GcZQzmZdpk1RfXJPofctuHAWxPkrA3JAD8uu31FnKLuaX31+THflz
 nF6OfC6QUHjZJL/WrbiUMBM=
 -----END PRIVATE KEY-----'''
-        self.cert = '''-----BEGIN CERTIFICATE-----
+
+DEFAULT_CERT = '''-----BEGIN CERTIFICATE-----
 MIID7DCCAtSgAwIBAgIEAQAABDANBgkqhkiG9w0BAQsFADBYMQswCQYDVQQGEwJD
 WjEaMBgGA1UEAwwRR0ZSIEVFVCB0ZXN0IENBIDExLTArBgNVBAoMJEdlbmVyw6Fs
 bsOtIGZpbmFuxI1uw60gxZllZGl0ZWxzdHbDrTAeFw0xNjA1MTkxMjQ4MjVaFw0x
@@ -61,7 +74,8 @@ CI+hY17rD5SHhuoCYzSMlcuMA6gZJr8wIxSWerQrvuZ4uAUMistWG9cgwETZjkGU
 YiCIG2qS+6lVO+09EIEP40kz1PXlqFZbPLCSlT2YsYiqizfkCX/Ka+AebJykAQ3p
 OqD6PQ+Y2AMAIRX8AypcN6Yj9p+oof9rda8boA8rA7wwzlJs/+ipWt2ceqPPuL9x
 -----END CERTIFICATE-----'''
-        self.root_crt = '''-----BEGIN CERTIFICATE-----
+
+DEFAULT_ROOT_CERT = '''-----BEGIN CERTIFICATE-----
 MIID1zCCAr+gAwIBAgIEAQAAADANBgkqhkiG9w0BAQsFADBYMQswCQYDVQQGEwJD
 WjEaMBgGA1UEAwwRR0ZSIEVFVCB0ZXN0IENBIDExLTArBgNVBAoMJEdlbmVyw6Fs
 bsOtIGZpbmFuxI1uw60gxZllZGl0ZWxzdHbDrTAeFw0xNjA1MDIxMTUyMjhaFw0y
@@ -85,9 +99,70 @@ QYsaCQHTMCABpVF1Ay0IuR5i7E+yPa938ZWoecFrlixYW9R+sH/Sfa8F22x4mj0c
 7yVZM6k7GdvJdS9AVwAcVcGfiqzPnS1LnZYM
 -----END CERTIFICATE-----'''
 
-    def getURL(self):
+default_url = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/?wsdl'
+
+class Config(object):
+
+    @staticmethod
+    def test():
+        return Config('CZ00000019', 237, '/5546/RO24', debug=False, key=DEFAULT_KEY, cert=DEFAULT_CERT, root_cert=DEFAULT_ROOT_CERT)
+
+
+    def __init__(self, dic, id_shop, id_register, key=None, key_file=None, key_password=None, cert=None, cert_file=None, root_cert=None, root_cert_file=None, url=None, simple=False, debug=False, dic_commission=None):
+        self.debug = debug
+        self.dic = dic
+        self.dic_commission = dic_commission
+        self.id_shop = id_shop
+        self.id_register = id_register
+        self.simple = simple
+        self.password = None
+        self.key = self._loadKey(key, key_file)
+        self.cert = self._loadCert(cert, cert_file)
+        self.root_crt = self._loadRootCert(cert, cert_file)
+        self.url = url or default_url
+
+    def _loadKey(self, key, key_file):
         if self.debug:
-            return 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/?wsdl'
+            return DEFAULT_KEY
 
-        return None
+        if key is not None:
+            return key
 
+        elif key_file is not None and isinstance(key_file, str):
+            key_file = open(key_file, 'r')
+
+        key = key_file.read()
+        key_file.close()
+        return key
+
+
+    def _loadCert(self, cert, cert_file):
+        if self.debug:
+            return DEFAULT_CERT
+
+        if cert is not None:
+            return cert
+
+        elif cert_file is not None and isinstance(cert_file, str):
+            cert_file = open(cert_file, 'r')
+
+        cert = cert_file.read()
+        cert_file.close()
+        return cert
+
+    def _loadRootCert(self, cert, cert_file):
+        if self.debug:
+            return DEFAULT_ROOT_CERT
+
+        if cert is not None:
+            return cert
+
+        elif cert_file is not None and isinstance(cert_file, str):
+            cert_file = open(cert_file, 'r')
+
+        cert = cert_file.read()
+        cert_file.close()
+        return cert
+
+def ns(namespace, tagname):
+    return '{%s}%s' % (namespace, tagname)
