@@ -14,5 +14,6 @@ setup(
             'cryptography==1.5',
             'requests==2.11.1',
             'lxml==3.6.4',
+            'pytz==2016.6.1',
             ],
       )
