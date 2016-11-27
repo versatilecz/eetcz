@@ -1,26 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# MIT License
-#
-# Copyright (c) 2016 Martin
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
 SOAP_NS = 'http://schemas.xmlsoap.org/soap/envelope/'
 EXC_NS = 'http://www.w3.org/2001/10/xml-exc-c14n#'
@@ -121,7 +99,7 @@ QYsaCQHTMCABpVF1Ay0IuR5i7E+yPa938ZWoecFrlixYW9R+sH/Sfa8F22x4mj0c
 7yVZM6k7GdvJdS9AVwAcVcGfiqzPnS1LnZYM
 -----END CERTIFICATE-----'''
 
-DEFAULT_URL = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/?wsdl'
+DEFAULT_URL = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/'
 
 class EETConfig(object):
 
@@ -144,9 +122,6 @@ class EETConfig(object):
         self.url = url or DEFAULT_URL
 
     def _loadKey(self, key, key_file):
-        if self.debug:
-            return DEFAULT_KEY
-
         if key is not None:
             return key
 
@@ -159,9 +134,6 @@ class EETConfig(object):
 
 
     def _loadCert(self, cert, cert_file):
-        if self.debug:
-            return DEFAULT_CERT
-
         if cert is not None:
             return cert
 
@@ -173,9 +145,6 @@ class EETConfig(object):
         return cert
 
     def _loadRootCert(self, cert, cert_file):
-        if self.debug:
-            return DEFAULT_ROOT_CERT
-
         if cert is not None:
             return cert
 
