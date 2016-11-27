@@ -35,8 +35,10 @@ setup(
         packages=['eet'],
         zip_safe=False,
         install_requires=[
-            'cryptography==1.5',
-            'requests==2.11.1',
-            'lxml==3.6.4',
+            'cryptography',
+            'requests',
+            'lxml',
+            'pytz',
+            'python-dateutil',
             ],
       )
