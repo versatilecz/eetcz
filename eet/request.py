@@ -123,7 +123,9 @@ class EETRequestData(object):
         self.price_sum = kwargs.get('price_sum')
         self.price_sum_non_vat = kwargs.get('price_sum_non_vat')
         self.price_sum_normal_vat = kwargs.get('price_sum_normal_vat')
+        self.price_sum_first_vat = kwargs.get('price_sum_first_vat')
         self.normal_vat_sum = kwargs.get('normal_vat_sum')
+        self.first_vat_sum = kwargs.get('first_vat_sum')
         #another field with specific vat
         self.simple = kwargs.get('simple', config.simple)
 
@@ -157,15 +159,21 @@ class EETRequestData(object):
     def getPriceSumNormalVat(self):
         return u'%.2f' % self.price_sum_normal_vat
 
+    def getPriceSumFirstVat(self):
+        return u'%.2f' % self.price_sum_first_vat
+
     def getNormalVatSum(self):
         return u'%.2f' % self.normal_vat_sum
+
+    def getFirstVatSum(self):
+        return u'%.2f' % self.first_vat_sum
 
     def getSimple(self):
         if self.simple:
             return u'1'
         return u'0'
 
-    def validate():
+    def validate(self):
         return True
 
     def element(self):
@@ -186,8 +194,14 @@ class EETRequestData(object):
         if self.price_sum_normal_vat:
             attrib[u'zakl_dan1'] = self.getPriceSumNormalVat()
 
+        if self.price_sum_first_vat:
+            attrib[u'zakl_dan2'] = self.getPriceSumFirstVat()
+
         if self.normal_vat_sum:
             attrib[u'dan1'] = self.getNormalVatSum()
+
+        if self.first_vat_sum:
+            attrib[u'dan2'] = self.getFirstVatSum()()
 
         attrib[u'rezim'] = self.getSimple()
 
