@@ -177,7 +177,7 @@ class EETRequestData(object):
             attrib[u'dan1'] = self.getNormalVatSum()
 
         if self.first_vat_sum:
-            attrib[u'dan2'] = self.getFirstVatSum()()
+            attrib[u'dan2'] = self.getFirstVatSum()
 
         attrib[u'rezim'] = self.getSimple()
 
@@ -308,6 +308,7 @@ class EETRequest(object):
         '''
         send request
         '''
+        print self.serialize()
         response = requests.post(self.config.url, data=self.serialize())
         response.raise_for_status()
         return EETResponse(response)
