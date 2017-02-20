@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import pytz
 import datetime
 from base64 import b64encode, b64decode
@@ -48,7 +49,7 @@ class EETRequestHeader(object):
         self.first_send = kwargs.get('first_send', True) # pokud se posila poprve
 
     def getUUID(self):
-        return unicode(self.uuid)
+        return str(self.uuid)
 
     def getDate(self):
         return formatDate(self.date)
@@ -109,19 +110,19 @@ class EETRequestData(object):
         return u'%s|%s|%s|%s|%s|%s' % (self.getDic(), self.getIdShop(), self.getIdRegister(), self.getNumber(), self.getDate(), self.getPriceSum())
 
     def getDic(self):
-        return unicode(self.dic)
+        return str(self.dic)
 
     def getDicCommision(self):
-        return unicode(self.dic_commission)
+        return str(self.dic_commission)
 
     def getIdShop(self):
-        return unicode(self.id_shop)
+        return str(self.id_shop)
 
     def getIdRegister(self):
-        return unicode(self.id_register)
+        return str(self.id_register)
 
     def getNumber(self):
-        return unicode(self.number)
+        return str(self.number)
 
     def getDate(self):
         return formatDate(self.date)
@@ -261,7 +262,7 @@ class EETRequest(object):
             'ValueType': X509TOKEN,
             ns(WSU_NS, 'Id'): token_id
             })
-        token.text = self.config.cert[28:-26].replace('\n', '')
+        token.text = self.config.cert[28:-26].replace(b'\n', b'')
 
         signature_id = get_unique_id()
         signature = etree.SubElement(security, ns(DS_NS, 'Signature'), attrib={'Id': signature_id})
@@ -308,7 +309,7 @@ class EETRequest(object):
         '''
         send request
         '''
-        print self.serialize()
+        #print self.serialize()
         response = requests.post(self.config.url, data=self.serialize())
         response.raise_for_status()
         return EETResponse(response)

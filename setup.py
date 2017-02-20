@@ -40,5 +40,11 @@ setup(
             'lxml',
             'pytz',
             'python-dateutil',
+            'simplejson',
             ],
+         entry_points={
+          'console_scripts': [
+              'eet_file = eet.__main__:eet_file'
+          ]
+      },
       )

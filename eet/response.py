@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import hashlib
 import textwrap
+import logging
 from base64 import b64encode, b64decode
 from lxml import etree
 from dateutil import parser
@@ -11,6 +13,9 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.x509 import load_pem_x509_certificate
 
 from eet.config import *
+
+logger = logging.getLogger(__name__)
+
 
 class EETResponse(object):
     '''
@@ -109,7 +114,7 @@ class EETResponse(object):
 
             # transform and load cert
             cert = '\n'.join(['-----BEGIN CERTIFICATE-----'] + textwrap.wrap(cert.text, 64) + ['-----END CERTIFICATE-----\n'])
-            cert = load_pem_x509_certificate(cert, default_backend())
+            cert = load_pem_x509_certificate(cert.encode('utf-8'), default_backend())
             key = cert.public_key()
 
             # verify digest
