@@ -196,3 +196,6 @@ def eet_file():
         'error': response.error,
         'warnings': response.warnings
     }, args.output)
+
+if __name__ == '__main__':
+    eet_file()
