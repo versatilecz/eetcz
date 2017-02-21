@@ -21,6 +21,7 @@ def eet_file():
         'dic_commission': None,
         'simple': False,
         'debug': False,
+
     }
 
     data = {
@@ -153,7 +154,8 @@ def eet_file():
 
     args = parser.parse_args()
     if args.config:
-        config_kwargs = json.load(args.config)
+        new_config = json.load(args.config)
+        config_kwargs.update(new_config)
         if 'dic' in config_kwargs:
             dic = config_kwargs['dic']
 
@@ -163,11 +165,11 @@ def eet_file():
         if 'register' in config_kwargs:
             id_register = config_kwargs['register']
 
-        if 'key' in config_kwargs:
-            key = config_kwargs['key']
+        if 'key' in new_config:
+            config_kwargs['key'] = config_kwargs['key'].encode('utf8')
 
-        if 'cert' in config_kwargs:
-            cert = config_kwargs['cert']
+        if 'cert' in new_config:
+            config_kwargs['cert'] = config_kwargs['cert'].encode('utf8')
 
     if args.dic:
         dic = args.dic
@@ -198,6 +200,24 @@ def eet_file():
 
     if not args.test:
         data = json.load(args.data_file)
+
+    if 'date' in data:
+        data['date'] = parse(data['date'])
+
+    if 'dic' in config_kwargs:
+        del config_kwargs['dic']
+
+    if 'id_shop' in config_kwargs:
+        del config_kwargs['id_shop']
+
+    if 'id_register' in config_kwargs:
+        del config_kwargs['id_register']
+
+    if 'shop' in config_kwargs:
+        del config_kwargs['shop']
+
+    if 'register' in config_kwargs:
+        del config_kwargs['register']
 
     if args.verbose:
         print("Config: ", {
