@@ -156,6 +156,12 @@ def eet_file():
     if args.url:
         url = args.url
 
+    if args.key_file:
+        key = args.key_file.read().encode('utf8')
+
+    if args.cert_file:
+        cert = args.cert_file.read().encode('utf8')
+
     if args.simple:
         simple = args.simple
 
@@ -190,6 +196,9 @@ def eet_file():
         print(request.serialize(), file=sys.stderr)
 
     response = request.send()
+    if args.verbose:
+        print(response.raw, file=sys.stderr)
+
     json.dump({
         'fik': response.fik,
         'bkp': response.bkp,
