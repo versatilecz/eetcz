@@ -18,8 +18,10 @@ from eet.config import *
 
 timezone = timezone = pytz.timezone('Europe/Prague')
 
+
 def now():
     return datetime.datetime.now(tz=timezone)
+
 
 def formatDate(date):
     if date is None:
@@ -33,8 +35,10 @@ def formatDate(date):
     else:
         return date.strftime('%Y-%m-%dT%H:%M:%S+02:00')
 
+
 def get_unique_id():
     return 'id-{0}'.format(uuid4())
+
 
 class EETRequestHeader(object):
     '''
@@ -81,7 +85,6 @@ class EETRequestHeader(object):
                                         },
                                 nsmap=NSMAP
                             )
-
 
 
 class EETRequestData(object):
@@ -184,6 +187,7 @@ class EETRequestData(object):
 
         return etree.Element(ns(EET_NS, 'Data'), attrib=attrib, nsmap=NSMAP)
 
+
 class EETRequestControl(object):
     '''
     '''
@@ -193,7 +197,6 @@ class EETRequestControl(object):
         self.sign = self._signByKey()
         self.pkp = self._encodeSign()
         self.bkp = self._hashSign()
-
 
     def _signByKey(self):
         private_key = serialization.load_pem_private_key(self.config.key, password=self.config.password, backend=default_backend())
@@ -219,6 +222,7 @@ class EETRequestControl(object):
         bkp.text = self.bkp
         return codes
 
+
 class EETRequest(object):
     '''
     Basic object, that get request
@@ -229,8 +233,7 @@ class EETRequest(object):
         '''
         Function,
         '''
-        return EETRequest(EETConfig.test(), date=now(), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42')
-
+        return EETRequest(EETConfig.test(), date=now(), price_sum=34113.00, price_sum_normal_vat=100, normal_vat_sum=21, number='0/6460/ZQ42', timeout=10)
 
     def __init__(self, config, **kwargs):
         '''
@@ -240,7 +243,7 @@ class EETRequest(object):
         self.header = EETRequestHeader(config)
         self.data = EETRequestData(config, **kwargs)
         self.code = EETRequestControl(config, self.data.getSignData())
-
+        self.timeout = kwargs.get('timeout', 10)
 
     def element(self):
         envelope = etree.Element(ns(SOAP_NS, 'Envelope'), nsmap=NSMAP)
@@ -310,6 +313,6 @@ class EETRequest(object):
         send request
         '''
         #print self.serialize()
-        response = requests.post(self.config.url, data=self.serialize())
+        response = requests.post(self.config.url, data=self.serialize(), timeout=self.timeout)
         response.raise_for_status()
         return EETResponse(response)

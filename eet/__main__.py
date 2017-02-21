@@ -4,21 +4,24 @@ from __future__ import print_function
 import argparse
 import json
 import sys
+from dateutil.parser import parse
 from eet import EETRequest, EETConfig, config
 
 
 def eet_file():
     parser = argparse.ArgumentParser(description='EET request through file')
     dic = 'CZ00000019'
-    dic_commission = None
     id_shop = 237
     id_register = '/5546/RO24'
-    url = config.DEFAULT_URL
-    key = config.DEFAULT_KEY
-    cert = config.DEFAULT_CERT
-    simple = False
-    debug = False
-    config_kwargs = {}
+
+    config_kwargs = {
+        'url': config.DEFAULT_URL,
+        'key': config.DEFAULT_KEY,
+        'cert': config.DEFAULT_CERT,
+        'dic_commission': None,
+        'simple': False,
+        'debug': False,
+    }
 
     data = {
         'price_sum': 34113.00,
@@ -84,6 +87,14 @@ def eet_file():
     )
 
     parser.add_argument(
+        '--date',
+        help='Datetime of transaction',
+        type=str,
+        dest='date',
+        default=None
+    )
+
+    parser.add_argument(
         '-g', '--debug',
         help='Debug mode',
         type=str,
@@ -141,11 +152,28 @@ def eet_file():
     )
 
     args = parser.parse_args()
+    if args.config:
+        config_kwargs = json.load(args.config)
+        if 'dic' in config_kwargs:
+            dic = config_kwargs['dic']
+
+        if 'shop' in config_kwargs:
+            id_shop = config_kwargs['shop']
+
+        if 'register' in config_kwargs:
+            id_register = config_kwargs['register']
+
+        if 'key' in config_kwargs:
+            key = config_kwargs['key']
+
+        if 'cert' in config_kwargs:
+            cert = config_kwargs['cert']
+
     if args.dic:
         dic = args.dic
 
     if args.dic2:
-        dic_commission = args.dic2
+        config_kwargs['dic_commission'] = args.dic2
 
     if args.shop:
         id_shop = args.shop
@@ -154,22 +182,19 @@ def eet_file():
         id_register = args.register
 
     if args.url:
-        url = args.url
+        config_kwargs['url'] = args.url
 
     if args.key_file:
-        key = args.key_file.read().encode('utf8')
+        config_kwargs['key'] = args.key_file.read().encode('utf8')
 
     if args.cert_file:
-        cert = args.cert_file.read().encode('utf8')
+        config_kwargs['cert'] = args.cert_file.read().encode('utf8')
 
     if args.simple:
-        simple = args.simple
+        config_kwargs['simple'] = args.simple
 
     if args.debug:
-        debug = args.debug
-
-    if args.config:
-        config_kwargs = json.load(args.config)
+        config_kwargs['debug'] = args.debug
 
     if not args.test:
         data = json.load(args.data_file)
@@ -185,11 +210,7 @@ def eet_file():
 
     c = EETConfig(
         dic, id_shop, id_register,
-        url=url,
-        key=key,
-        cert=cert,
-        simple=simple,
-        debug=debug
+        **config_kwargs
     )
     request = EETRequest(c, **data)
     if args.verbose:
@@ -202,9 +223,11 @@ def eet_file():
     json.dump({
         'fik': response.fik,
         'bkp': response.bkp,
+        'pkp': str(request.code.pkp),
         'error': response.error,
         'warnings': response.warnings
     }, args.output)
+
 
 if __name__ == '__main__':
     eet_file()
