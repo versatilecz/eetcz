@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from eet.response import EETResponse
 from eet.config import *
 
-timezone = timezone = pytz.timezone('Europe/Prague')
+timezone = pytz.timezone('Europe/Prague')
 
 
 def now():
@@ -26,14 +26,9 @@ def now():
 def formatDate(date):
     if date is None:
         date = now()
-
     if date.tzinfo is None:
         date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second, 0)
-
-    if False:
-        return date.strftime('%Y-%m-%dT%H:%M:%S+01:00')
-    else:
-        return date.strftime('%Y-%m-%dT%H:%M:%S+02:00')
+    return date.isoformat()
 
 
 def get_unique_id():
