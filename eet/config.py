@@ -110,14 +110,21 @@ F9OTF6UdKfXkvt+NmW7ayYwd+F4+3pfFr3wvBNdrG6tm/SUZBQ41Tt4OTKWg
 
 DEFAULT_URL = 'https://pg.eet.cz/eet/services/EETServiceSOAP/v3/'
 
+
 class EETConfig(object):
 
     @staticmethod
     def test():
-        return EETConfig('CZ00000019', 237, '/5546/RO24', debug=False, key=DEFAULT_KEY, cert=DEFAULT_CERT, root_cert=DEFAULT_ROOT_CERT)
+        return EETConfig(
+            'CZ00000019', 237, '/5546/RO24', debug=False,
+            key=DEFAULT_KEY, cert=DEFAULT_CERT, root_cert=DEFAULT_ROOT_CERT
+        )
 
-
-    def __init__(self, dic, id_shop, id_register, key=None, key_file=None, key_password=None, cert=None, cert_file=None, root_cert=None, root_cert_file=None, url=None, simple=False, debug=False, dic_commission=None):
+    def __init__(
+        self, dic, id_shop, id_register, key=None, key_file=None, key_password=None,
+        cert=None, cert_file=None, root_cert=None, root_cert_file=None,
+        url=None, simple=False, debug=False, dic_commission=None
+    ):
         self.debug = debug
         self.dic = dic
         self.dic_commission = dic_commission
@@ -141,7 +148,6 @@ class EETConfig(object):
         key_file.close()
         return key
 
-
     def _loadCert(self, cert, cert_file):
         if cert is not None:
             return cert
@@ -163,6 +169,7 @@ class EETConfig(object):
         cert = cert_file.read()
         cert_file.close()
         return cert
+
 
 def ns(namespace, tagname):
     return '{%s}%s' % (namespace, tagname)

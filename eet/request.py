@@ -26,8 +26,10 @@ def now():
 def formatDate(date):
     if date is None:
         date = now()
+
     if date.tzinfo is None:
-        date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second, 0)
+        date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second, 0, tzinfo=timezone)
+
     return date.isoformat()
 
 
