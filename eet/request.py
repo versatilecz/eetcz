@@ -27,10 +27,8 @@ def formatDate(date):
     if date is None:
         date = now()
 
-    if date.tzinfo is None:
-        date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second, 0, tzinfo=timezone)
-
-    return date.isoformat()
+    date = datetime.datetime(date.year, date.month, date.day, date.hour, date.minute, date.second, 0, tzinfo=timezone)
+    return date.astimezone(timezone).isoformat()
 
 
 def get_unique_id():
@@ -309,7 +307,7 @@ class EETRequest(object):
         '''
         send request
         '''
-        #print self.serialize()
+        #print("SERIALIZE", self.serialize())
         response = requests.post(self.config.url, data=self.serialize(), timeout=self.timeout)
         response.raise_for_status()
         return EETResponse(response)
